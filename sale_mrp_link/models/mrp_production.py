@@ -16,9 +16,11 @@ class MrpProduction(models.Model):
     def create(self, values):
         if "origin" in values:
             # Checking first if this comes from a 'sale.order'
-            sale_id = self.env["sale.order"].search(
-                [("name", "=", values["origin"])], limit=1
-            )
+            sale_id = self.env["sale.order"].browse(values.get("sale_order_id"))
+            if not sale_id:
+                sale_id = self.env["sale.order"].search(
+                    [("name", "=", values["origin"])], limit=1
+                )
             if sale_id:
                 values["sale_order_id"] = sale_id.id
                 if sale_id.client_order_ref:
